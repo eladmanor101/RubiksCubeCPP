@@ -7,7 +7,7 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 800), "Rubiks Cube");
+	sf::RenderWindow window(sf::VideoMode({800, 800}), "Rubiks Cube");
 
 	RubiksCube cube{ window };
 
@@ -18,17 +18,17 @@ int main()
 	sf::Clock clock;
 	while (window.isOpen())
 	{
-		sf::Event e;
-		while (window.pollEvent(e))
+		while (const std::optional event = window.pollEvent())
 		{
-			switch (e.type)
+			if (event->is<sf::Event::MouseButtonPressed>())
 			{
-			case sf::Event::MouseButtonPressed:
-				if (e.mouseButton.button == sf::Mouse::Left);
+				/*
+				* if (e.mouseButton.button == sf::Mouse::Left);
 					//cube.mouse_held_pos = sf::Vector2f(e.mouseButton.x, e.mouseButton.y);
-				break;
+				*/
 			}
 		}
+
 		prev_mouse_pos = curr_mouse_pos;
 		curr_mouse_pos = sf::Vector2f{ sf::Mouse::getPosition(window) };
 		diff_mouse_pos = curr_mouse_pos - prev_mouse_pos;
@@ -42,7 +42,7 @@ int main()
 		//cube.debugPrint();
 
 		window.clear();
-		if (window.hasFocus() && sf::Mouse::isButtonPressed(sf::Mouse::Left) && diff_mouse_pos.x * diff_mouse_pos.x + diff_mouse_pos.y * diff_mouse_pos.y > 0.0001f)
+		if (window.hasFocus() && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && diff_mouse_pos.x * diff_mouse_pos.x + diff_mouse_pos.y * diff_mouse_pos.y > 0.0001f)
 			cube.rotate(diff_mouse_pos);
 		cube.render(window);
 		window.display();

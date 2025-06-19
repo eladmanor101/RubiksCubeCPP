@@ -10,14 +10,21 @@ void paint::line(sf::RenderWindow& window, sf::Vector2f start, sf::Vector2f end,
 	sf::Vector2f dir_perp_norm{ -dir_norm.y, dir_norm.x };
 	sf::Vector2f dir_perp{ dir_perp_norm * (thickness / 2.0f) };
 
-	sf::Vertex vertices[4];
-	vertices[0].position = start + dir_perp;
-	vertices[1].position = end + dir_perp;
-	vertices[2].position = end - dir_perp;
-	vertices[3].position = start - dir_perp;
+	sf::VertexArray first_triangle(sf::PrimitiveType::Triangles, 3);
+	sf::VertexArray second_triangle(sf::PrimitiveType::Triangles, 3);
+	first_triangle[0].position = start + dir_perp;
+	first_triangle[1].position = end + dir_perp;
+	first_triangle[2].position = end - dir_perp;
+	second_triangle[0].position = start + dir_perp;
+	second_triangle[1].position = end - dir_perp;
+	second_triangle[2].position = start - dir_perp;
 
-	for (int i = 0; i < 4; i++)
-		vertices[i].color = color;
+	for (int i = 0; i < 3; i++)
+	{
+		first_triangle[i].color = color;
+		second_triangle[i].color = color;
+	}
 
-	window.draw(vertices, 4, sf::Quads);
+	window.draw(first_triangle);
+	window.draw(second_triangle);
 }
