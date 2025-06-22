@@ -2,6 +2,22 @@
 
 #include "../Utilities/Transform.h"
 
+sf::Vector3f RubiksCube::normal(const Cubelet& cubelet, int face_index)
+{
+	sf::Vector3f face_vertices_3d[4];
+	for (int j = 0; j < 4; j++)
+		face_vertices_3d[j] = transform::rotateVertex(
+			original_vertices[face_indices[face_index][j]] + cubelet.position,
+			rotation_matrix
+		);
+
+	sf::Vector3f diff1 = face_vertices_3d[1] - face_vertices_3d[0];
+	sf::Vector3f diff2 = face_vertices_3d[2] - face_vertices_3d[1];
+	sf::Vector3f face_normal{ math::normalize(math::cross(diff1, diff2)) };
+
+	return face_normal;
+}
+
 RubiksCube::RubiksCube(sf::RenderWindow& window) : window(window)
 {
 	for (int i = -1; i <= 1; i++)
@@ -32,6 +48,9 @@ RubiksCube::RubiksCube(sf::RenderWindow& window) : window(window)
 
 void RubiksCube::render(sf::RenderWindow& window)
 {
+
+	std::cout << normal(cubelets[0], 5).z << std::endl;
+	
 	auto cmp = [this](Cubelet a, Cubelet b)
 	{
 		sf::Vector3f a_vertices[4];
@@ -88,11 +107,9 @@ void RubiksCube::render(sf::RenderWindow& window)
 					rotation_matrix
 				);
 
-			sf::Vector3f diff1 = face_vertices_3d[1] - face_vertices_3d[0];
-			sf::Vector3f diff2 = face_vertices_3d[2] - face_vertices_3d[1];
-			sf::Vector3f face_normal{ math::cross(diff1, diff2) };
+			sf::Vector3f face_normal{ normal(cubelet, i) };
 
-			if (math::dot(face_normal, sf::Vector3f{ 0, 0, 1 }) < 0) // DOT with camera direction
+			if (math::dot(face_normal, face_vertices_3d[0] + transform::CUBE_POSITION) > 0) // DOT with camera direction
 			{
 				sf::Vector2f face_vertices_2d[4];
 				for (int j = 0; j < 4; j++)
