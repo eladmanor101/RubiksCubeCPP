@@ -31,3 +31,15 @@ void paint::line(sf::RenderWindow& window, sf::Vector2f start, sf::Vector2f end,
 	window.draw(first_triangle);
 	window.draw(second_triangle);
 }
+
+void paint::rect(sf::RenderWindow& window, sf::Vector2f vertices[], sf::Color fill_color)
+{
+	sf::ConvexShape rect(4);
+
+	for (int i = 0; i < 4; i++)
+		rect.setPoint(i, vertices[i]);
+
+	rect.setFillColor(fill_color);
+
+	window.draw(rect);
+}

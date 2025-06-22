@@ -145,6 +145,7 @@
     <ClInclude Include="src\Objects\RubiksCube.h" />
     <ClInclude Include="src\Utilities\Math.h" />
     <ClInclude Include="src\Utilities\Paint.h" />
+    <ClInclude Include="src\Utilities\Transform.h" />
     <ClInclude Include="src\Utilities\Types\Mat3f.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

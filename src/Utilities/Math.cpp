@@ -20,7 +20,7 @@ sf::Vector3f math::normalize(const sf::Vector3f v)
     return { v / math::length(v) };
 }
 
-sf::Vector3f math::multiplyByMatrix(const Mat3f matrix, const sf::Vector3f v)
+sf::Vector3f math::multiplyByMatrix(const Mat3f& matrix, const sf::Vector3f v)
 {
 	sf::Vector3f r;
 
@@ -47,7 +47,7 @@ sf::Vector3f math::cross(const sf::Vector3f v1, const sf::Vector3f v2)
 	return r;
 }
 
-Mat3f math::multiplyMatrices(const Mat3f a, const Mat3f b)
+Mat3f math::multiplyMatrices(const Mat3f& a, const Mat3f& b)
 {
     Mat3f result;
 
