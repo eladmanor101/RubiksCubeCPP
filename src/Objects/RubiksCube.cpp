@@ -2,21 +2,57 @@
 
 RubiksCube::RubiksCube(sf::RenderWindow& window) : window(window)
 {
-	// Store the indices of adjacent vertices
-	for (int i = 0; i < 8; i++)
+	for (int i = -1; i <= 1; i++)
 	{
-		for (int j = i + 1; j < 8; j++)
+		for (int j = -1; j <= 1; j++)
 		{
-			const sf::Vector3f vi{ vertices[i] };
-			const sf::Vector3f vj{ vertices[j] };
-			if (abs(math::dist(vi, vj) - 2) < 0.01f)
-				edge_indices.emplace_back(std::make_pair(i, j));
+			for (int k = -1; k <= 1; k++)
+			{
+				if (i == 0 && j == 0 && k == 0)
+					continue;
+
+				int index = (i + 1) * 9 + (j + 1) * 3 + (k + 1);
+				if (index > 12) index--;
+
+				cubelets[index].position = sf::Vector3f(i, j, k);
+
+				// Initial cubelets face colors
+				if (i == 1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::RED)] = FaceColors::RED;
+				if (i == -1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::ORANGE)] = FaceColors::ORANGE;
+				if (j == 1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::WHITE)] = FaceColors::WHITE;
+				if (j == -1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::YELLOW)] = FaceColors::YELLOW;
+				if (k == 1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::BLUE)] = FaceColors::BLUE;
+				if (k == -1) cubelets[index].face_colors[static_cast<size_t>(FaceColors::GREEN)] = FaceColors::GREEN;
+			}
 		}
 	}
 }
 
 void RubiksCube::render(sf::RenderWindow& window)
 {
+	for (const Cubelet& cubelet : cubelets)
+	{
+		// Apply 3D transformation and project onto the screen
+		std::array<sf::Vector2f, 8> projected_vertices;
+		for (int i = 0; i < 8; i++)
+		{
+			projected_vertices[i] = toScreenCords(
+				rotateVertex(
+					original_vertices[i] + cubelet.position
+				) + CUBE_POSITION
+			);
+		}
+
+		// Draw edges
+		for (int i = 0; i < 4; i++)
+		{
+			paint::line(window, projected_vertices[i], projected_vertices[(i + 1) % 4], EDGE_THICKNESS, EDGE_COLOR);
+			paint::line(window, projected_vertices[i + 4], projected_vertices[(i + 1) % 4 + 4], EDGE_THICKNESS, EDGE_COLOR);
+			paint::line(window, projected_vertices[i], projected_vertices[i + 4], EDGE_THICKNESS, EDGE_COLOR);
+		}
+	}
+
+	/*
 	std::vector<sf::Vector2f> vertex_arr;
 	for (int i = 0; i < 8; i++)
 	{
@@ -66,44 +102,20 @@ void RubiksCube::render(sf::RenderWindow& window)
 			paint::line(window, toScreenCords(v1), toScreenCords(v2), 3, sf::Color::Black);
 		}
 	}
+	*/
 }
 
 void RubiksCube::rotate(sf::Vector2f dr)
 {
-	sf::Vector3f dr3{ dr.x, dr.y, 0 };
-	sf::Vector3f axis{ dr3.y, -dr3.x, 0 };
-	for (int i = 0; i < 8; i++)
-	{
-		float x = math::length(axis) / 100.0f;
-		vertices[i] = rotateVertexByAxis(vertices[i], axis, x);
-		vertices[i] = sqrtf(3) * math::normalize(vertices[i]);
-	}
+	sf::Vector3f axis{ dr.y, -dr.x, 0 };
+	float angle = math::length(dr) / 100.0f;
+
+	rotation_matrix = math::multiplyMatrices(math::getMatrixFromAxisAngle(axis, angle), rotation_matrix);
 }
 
 sf::Vector3f RubiksCube::rotateVertex(const sf::Vector3f vertex)
 {
-	float rotation_matrix_x[3][3]{
-		{1, 0, 0},
-		{0, cos(angle.x), -sin(angle.x)},
-		{0, sin(angle.x), cos(angle.x)}
-	};
-	float rotation_matrix_y[3][3]{
-		{cos(angle.y), 0, sin(angle.y)},
-		{0, 1, 0},
-		{-sin(angle.y), 0, cos(angle.y)}
-	};
-	float rotation_matrix_z[3][3]{
-		{cos(angle.z), -sin(angle.z), 0},
-		{sin(angle.z), cos(angle.z), 0},
-		{0, 0, 1}
-	};
-
-	sf::Vector3f rotated_vertex{ vertex };
-	rotated_vertex = math::multiplyByMatrix(rotated_vertex, rotation_matrix_x);
-	rotated_vertex = math::multiplyByMatrix(rotated_vertex, rotation_matrix_y);
-	rotated_vertex = math::multiplyByMatrix(rotated_vertex, rotation_matrix_z);
-
-	return rotated_vertex;
+	return math::multiplyByMatrix(rotation_matrix, vertex);
 }
 
 sf::Vector3f RubiksCube::rotateVertexByAxis(sf::Vector3f v, sf::Vector3f axis, float angle)
@@ -119,8 +131,7 @@ sf::Vector3f RubiksCube::rotateVertexByAxis(sf::Vector3f v, sf::Vector3f axis, f
 
 sf::Vector2f RubiksCube::projectVertex(const sf::Vector3f vertex)
 {
-	sf::Vector2f projected_vertex{ vertex.x / vertex.z, vertex.y / vertex.z };
-	return projected_vertex;
+	return { vertex.x / vertex.z, vertex.y / vertex.z };
 }
 
 sf::Vector3f RubiksCube::toSpaceCoords(const sf::Vector2f v, float z)

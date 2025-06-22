@@ -139,11 +139,13 @@
     <ClCompile Include="src\Objects\RubiksCube.cpp" />
     <ClCompile Include="src\Utilities\Math.cpp" />
     <ClCompile Include="src\Utilities\Paint.cpp" />
+    <ClCompile Include="src\Utilities\Types\Mat3f.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Objects\RubiksCube.h" />
     <ClInclude Include="src\Utilities\Math.h" />
     <ClInclude Include="src\Utilities\Paint.h" />
+    <ClInclude Include="src\Utilities\Types\Mat3f.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

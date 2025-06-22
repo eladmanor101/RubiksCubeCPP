@@ -7,7 +7,7 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode({800, 800}), "Rubiks Cube");
+	sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Rubiks Cube");
 
 	RubiksCube cube{ window };
 

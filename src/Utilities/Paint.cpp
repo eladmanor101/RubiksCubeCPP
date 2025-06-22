@@ -6,6 +6,9 @@ void paint::line(sf::RenderWindow& window, sf::Vector2f start, sf::Vector2f end,
 {
 	sf::Vector2f dir{ end - start };
 	float dir_length{ math::length(dir) };
+
+	if (dir_length == 0) return;
+
 	sf::Vector2f dir_norm{ dir / dir_length };
 	sf::Vector2f dir_perp_norm{ -dir_norm.y, dir_norm.x };
 	sf::Vector2f dir_perp{ dir_perp_norm * (thickness / 2.0f) };

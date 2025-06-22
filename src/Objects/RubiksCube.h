@@ -9,6 +9,22 @@
 #include "../Utilities/Math.h"
 #include "../Utilities/Paint.h"
 
+const sf::Color EDGE_COLOR{ sf::Color::Magenta };
+const int EDGE_THICKNESS{ 3 };
+
+enum class FaceColors {
+	WHITE, YELLOW, GREEN, RED, BLUE, ORANGE
+};
+
+// Represents a single corner/edge/center piece
+struct Cubelet
+{
+	sf::Vector3f position; // Relative to the cube center
+	std::array<std::optional<FaceColors>, 6> face_colors; // white, yellow, green, red, blue, orange (positions)
+};
+
+constexpr int face_indices[][]{ {4, 5, 6, 7}, {0, 1, 2, 3}, {} };
+
 class RubiksCube
 {
 public:
@@ -17,18 +33,8 @@ public:
 	void render(sf::RenderWindow& window);
 	void rotate(sf::Vector2f dr);
 
-	void debugPrint()
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			std::cout << vertices[i].x << ' ' << vertices[i].y << ' ' << vertices[i].z << '\n';
-		}
-		std::cout << "----------------------------------------------\n";
-	}
-
 public:
-	sf::Vector3f angle{ 0.0f, 0.0f, 0.0f };
-	sf::Vector3f input_angle{ 0.0f, 0.0f, 0.0f };
+	Mat3f rotation_matrix{ Mat3f::identity() };
 
 private:
 	sf::Vector3f rotateVertex(const sf::Vector3f vertex);
@@ -39,16 +45,19 @@ private:
 	sf::Vector2f toScreenCords(const sf::Vector3f v);
 
 private:
-	std::array<sf::Vector3f, 8> vertices
+	std::array<Cubelet, 26> cubelets{};
+
+	// 0-3 and 4-7 are faces, where indices i, i+4 are connected with an edge between the faces
+	std::array<sf::Vector3f, 8> original_vertices
 	{
-		sf::Vector3f(-1, -1, 1),
-		sf::Vector3f(1, 1, 1),
-		sf::Vector3f(-1, 1, 1),
-		sf::Vector3f(1, -1, 1),
-		sf::Vector3f(-1, -1, -1),
-		sf::Vector3f(1, 1, -1),
-		sf::Vector3f(-1, 1, -1),
-		sf::Vector3f(1, -1, -1)
+		sf::Vector3f(-0.5, -0.5, 0.5),	// front bottom left
+		sf::Vector3f(-0.5, 0.5, 0.5),	// front top left
+		sf::Vector3f(0.5, 0.5, 0.5),	// front top right
+		sf::Vector3f(0.5, -0.5, 0.5),	// front bottom right
+		sf::Vector3f(-0.5, -0.5, -0.5),	// back bottom left
+		sf::Vector3f(-0.5, 0.5, -0.5),	// back top left
+		sf::Vector3f(0.5, 0.5, -0.5),	// back top right
+		sf::Vector3f(0.5, -0.5, -0.5)	// back bottom right
 	};
 	const sf::Vector3f CUBE_POSITION{ 0, 0, 4 };
 
