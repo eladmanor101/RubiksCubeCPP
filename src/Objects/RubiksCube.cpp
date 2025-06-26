@@ -48,9 +48,6 @@ RubiksCube::RubiksCube(sf::RenderWindow& window) : window(window)
 
 void RubiksCube::render(sf::RenderWindow& window)
 {
-
-	std::cout << normal(cubelets[0], 5).z << std::endl;
-	
 	auto cmp = [this](Cubelet a, Cubelet b)
 	{
 		sf::Vector3f a_vertices[4];
@@ -87,7 +84,6 @@ void RubiksCube::render(sf::RenderWindow& window)
 			);
 		}
 
-		/*
 		// Draw edges
 		for (int i = 0; i < 4; i++)
 		{
@@ -95,7 +91,6 @@ void RubiksCube::render(sf::RenderWindow& window)
 			paint::line(window, projected_vertices[i + 4], projected_vertices[(i + 1) % 4 + 4], EDGE_THICKNESS, EDGE_COLOR);
 			paint::line(window, projected_vertices[i], projected_vertices[i + 4], EDGE_THICKNESS, EDGE_COLOR);
 		}
-		*/
 
 		// Draw faces
 		for (int i = 0; i < 6; i++)
@@ -109,69 +104,20 @@ void RubiksCube::render(sf::RenderWindow& window)
 
 			sf::Vector3f face_normal{ normal(cubelet, i) };
 
-			if (math::dot(face_normal, face_vertices_3d[0] + transform::CUBE_POSITION) > 0) // DOT with camera direction
+			if (math::dot(face_normal, face_vertices_3d[0] + transform::CUBE_POSITION) < 0) // DOT with camera direction
 			{
 				sf::Vector2f face_vertices_2d[4];
 				for (int j = 0; j < 4; j++)
 					face_vertices_2d[j] = transform::toScreenCoords(window, face_vertices_3d[j], transform::CUBE_POSITION);
 
-				sf::Color color = cubelet.face_colors[i].has_value() ? FACE_SF_COLORS[static_cast<size_t>(cubelet.face_colors[i].value())] : sf::Color::Transparent;
-				paint::rect(window, face_vertices_2d, color);
+				if (cubelet.face_colors[i].has_value())
+				{
+					sf::Color color{ FACE_SF_COLORS[static_cast<size_t>(cubelet.face_colors[i].value())] };
+					paint::rect(window, face_vertices_2d, color);
+				}
 			}
 		}
 	}
-
-	/*
-	std::vector<sf::Vector2f> vertex_arr;
-	for (int i = 0; i < 8; i++)
-	{
-		sf::Vector2f proj = projectVertex(rotateVertex(vertices[i]) + CUBE_POSITION);
-		proj.x = window.getSize().x * (proj.x + 1) / 2.0f;
-		proj.y = window.getSize().y * (proj.y + 1) / 2.0f;
-		vertex_arr.push_back(proj);
-	}
-
-	// Sort the faces according to the average z position of their vertices
-	auto comp = [this](std::pair<std::array<int, 4>, sf::Color> a, std::pair<std::array<int, 4>, sf::Color> b)
-		{
-			float avg1 = (vertices[a.first[0]].z + vertices[a.first[1]].z + vertices[a.first[2]].z + vertices[a.first[3]].z) / 4.0f;
-			float avg2 = (vertices[b.first[0]].z + vertices[b.first[1]].z + vertices[b.first[2]].z + vertices[b.first[3]].z) / 4.0f;
-
-			return avg1 > avg2;
-		};
-	std::sort(face_indices.begin(), face_indices.end(), comp);
-
-	// Draw the faces
-	for (int f = 3; f < 6; f++)
-	{
-		auto& face{ face_indices[f] };
-
-		sf::ConvexShape face_shape{ 4 };
-		face_shape.setFillColor(face.second);
-		for (int i = 0; i < 4; i++)
-		{
-			face_shape.setPoint(i, vertex_arr[face.first[i]]);
-			// Draw the outer edges
-			for (int j = i + 1; j < 4; j++)
-				paint::line(window, vertex_arr[face.first[i]], vertex_arr[face.first[j]], 5, sf::Color::Black);
-		}
-		window.draw(face_shape);
-
-		// Draw the inner edges
-		for (int i = 0; i < 4; i++)
-		{
-			int j{ (i + 1) % 4 };
-			int b{ (i + 3) % 4 };
-			sf::Vector3f v1{ vertices[face.first[i]] };
-			sf::Vector3f v2{ vertices[face.first[j]] };
-			sf::Vector3f vb{ vertices[face.first[b]] };
-			sf::Vector3f offset{ (vb - v1) / 3.0f };
-			v1 += offset;
-			v2 += offset;
-			paint::line(window, toScreenCords(v1), toScreenCords(v2), 3, sf::Color::Black);
-		}
-	}
-	*/
 }
 
 void RubiksCube::rotate(sf::Vector2f dr)

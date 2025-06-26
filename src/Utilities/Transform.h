@@ -6,7 +6,7 @@
 
 namespace transform
 {
-	constexpr sf::Vector3f CUBE_POSITION{ 0, 0, 4 };
+	constexpr sf::Vector3f CUBE_POSITION{ 0, 0, 7 };
 
 	sf::Vector2f projectVertex(sf::Vector3f vertex)
 	{
@@ -28,7 +28,7 @@ namespace transform
 
 	sf::Vector2f toScreenCoords(const sf::RenderWindow& window, sf::Vector3f v)
 	{
-		sf::Vector2f proj = transform::projectVertex(v + CUBE_POSITION);
+		sf::Vector2f proj = transform::projectVertex(v);
 		proj.x = window.getSize().x * (proj.x + 1) / 2.0f;
 		proj.y = window.getSize().y * (proj.y + 1) / 2.0f;
 		return proj;

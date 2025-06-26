@@ -15,7 +15,7 @@
 * Z axis is depth      (inward - positive)
 */
 
-const sf::Color EDGE_COLOR{ sf::Color::Magenta };
+const sf::Color EDGE_COLOR{ sf::Color::Black };
 const int EDGE_THICKNESS{ 3 };
 
 enum class FaceColors {
@@ -67,28 +67,15 @@ private:
 	// 0-3 and 4-7 are faces, where indices i, i+4 are connected with an edge between the faces
 	std::array<sf::Vector3f, 8> original_vertices
 	{
-		sf::Vector3f{ -0.5, 0.5, -0.5 },	// front bottom left
+		sf::Vector3f{ -0.5,  0.5, -0.5 },	// front bottom left
 		sf::Vector3f{ -0.5, -0.5, -0.5 },	// front top left
-		sf::Vector3f{ 0.5, -0.5, -0.5 },	// front top right
-		sf::Vector3f{ 0.5, 0.5, -0.5 },	// front bottom right
-		sf::Vector3f{ -0.5, 0.5, 0.5 },	// back bottom left
-		sf::Vector3f{ -0.5, -0.5, 0.5 },	// back top left
-		sf::Vector3f{ 0.5, -0.5, 0.5 },	// back top right
-		sf::Vector3f{ 0.5, 0.5, 0.5 }		// back bottom right
-	};
-	std::array<sf::Vector3f, 6> face_normals
-	{
-		sf::Vector3f{  0, -1,  0 },
-		sf::Vector3f{  0,  1,  0 },
-		sf::Vector3f{  0,  0, -1 },
-		sf::Vector3f{  1,  0,  0 },
-		sf::Vector3f{  0,  0,  1 },
-		sf::Vector3f{ -1,  0,  0 }
+		sf::Vector3f{  0.5, -0.5, -0.5 },	// front top right
+		sf::Vector3f{  0.5,  0.5, -0.5 },	// front bottom right
+		sf::Vector3f{ -0.5,  0.5,  0.5 },	// back bottom left
+		sf::Vector3f{ -0.5, -0.5,  0.5 },	// back top left
+		sf::Vector3f{  0.5, -0.5,  0.5 },	// back top right
+		sf::Vector3f{  0.5,  0.5,  0.5 }	// back bottom right
 	};
 
 	sf::RenderWindow& window;
-
-	std::vector<std::pair<int, int>> edge_indices;
-
-	sf::Color values[6][3][3];
 };
